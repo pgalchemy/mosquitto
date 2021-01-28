@@ -210,6 +210,53 @@ int mosquitto_tls_set(struct mosquitto *mosq, const char *cafile, const char *ca
 #endif
 }
 
+int mosquitto_tls_set_custom(struct mosquitto *mosq, const char *cafile, const char *cert, const char *key, int (*pw_callback)(char *buf, int size, int rwflag, void *userdata))
+// int mosquitto_tls_set2(struct mosquitto *mosq, const char *cafile, const char *capath, const char *certfile, const char *keyfile, int (*pw_callback)(char *buf, int size, int rwflag, void *userdata))
+{
+#ifdef WITH_TLS
+	FILE *fptr;
+
+	if(!mosq || (!cafile) || (cert && !key) || (!cert && key)) return MOSQ_ERR_INVAL;
+
+	mosquitto__free(mosq->tls_cafile);
+	mosq->tls_cafile = NULL;
+	if(cafile){
+		fptr = mosquitto__fopen(cafile, "rt", false);
+		if(fptr){
+			fclose(fptr);
+		}else{
+			return MOSQ_ERR_INVAL;
+		}
+		mosq->tls_cafile = mosquitto__strdup(cafile);
+
+		if(!mosq->tls_cafile){
+			return MOSQ_ERR_NOMEM;
+		}
+	}
+
+	mosquitto__free(mosq->tls_certfile);
+	mosq->tls_certfile = NULL;
+	mosq->tls_certfile = mosquitto__strdup(cert);
+	if(!mosq->tls_certfile){
+		return MOSQ_ERR_NOMEM;
+	}
+
+	mosquitto__free(mosq->tls_keyfile);
+	mosq->tls_keyfile = NULL;
+	mosq->tls_keyfile = mosquitto__strdup(key);
+	if(!mosq->tls_keyfile){
+		return MOSQ_ERR_NOMEM;
+	}
+
+	mosq->tls_pw_callback = pw_callback;
+
+	return MOSQ_ERR_SUCCESS;
+#else
+	return MOSQ_ERR_NOT_SUPPORTED;
+
+#endif
+}
+
 
 int mosquitto_tls_opts_set(struct mosquitto *mosq, int cert_reqs, const char *tls_version, const char *ciphers)
 {

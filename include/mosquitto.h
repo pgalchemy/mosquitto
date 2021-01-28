@@ -1797,6 +1797,9 @@ libmosq_EXPORT int mosquitto_tls_set(struct mosquitto *mosq,
 		const char *certfile, const char *keyfile,
 		int (*pw_callback)(char *buf, int size, int rwflag, void *userdata));
 
+//custom
+libmosq_EXPORT int mosquitto_tls_set_custom(struct mosquitto *mosq, const char *cafile, const char *cert, const char *key, int (*pw_callback)(char *buf, int size, int rwflag, void *userdata));
+
 /*
  * Function: mosquitto_tls_insecure_set
  *

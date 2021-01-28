@@ -781,7 +781,14 @@ static int net__init_ssl_ctx(struct mosquitto *mosq)
 			}
 
 			if(mosq->tls_certfile){
-				ret = SSL_CTX_use_certificate_chain_file(mosq->ssl_ctx, mosq->tls_certfile);
+				//custom
+				BIO *bio;
+				X509 *certificate;
+				bio = BIO_new(BIO_s_mem());
+				BIO_puts(bio, (const char*)mosq->tls_certfile);
+				certificate = PEM_read_bio_X509(bio, NULL, NULL, NULL);
+				ret = SSL_CTX_use_certificate(mosq->ssl_ctx, certificate);
+				// ret = SSL_CTX_use_certificate_chain_file(mosq->ssl_ctx, mosq->tls_certfile);
 				if(ret != 1){
 #ifdef WITH_BROKER
 					log__printf(mosq, MOSQ_LOG_ERR, "Error: Unable to load client certificate, check bridge_certfile \"%s\".", mosq->tls_certfile);
@@ -829,7 +836,12 @@ static int net__init_ssl_ctx(struct mosquitto *mosq)
 					}
 #endif
 				}else{
-					ret = SSL_CTX_use_PrivateKey_file(mosq->ssl_ctx, mosq->tls_keyfile, SSL_FILETYPE_PEM);
+					//custom
+					BIO *mem;
+					mem = BIO_new_mem_buf(mosq->tls_keyfile, -1);
+					EVP_PKEY* key = PEM_read_bio_PrivateKey(mem, NULL, NULL, 0);
+					ret = SSL_CTX_use_PrivateKey(mosq->ssl_ctx, key);
+					// ret = SSL_CTX_use_PrivateKey_file(mosq->ssl_ctx, mosq->tls_keyfile, SSL_FILETYPE_PEM);
 					if(ret != 1){
 #ifdef WITH_BROKER
 						log__printf(mosq, MOSQ_LOG_ERR, "Error: Unable to load client key file, check bridge_keyfile \"%s\".", mosq->tls_keyfile);
