@@ -82,7 +82,7 @@ WITH_SOCKS:=yes
 WITH_STRIP:=no
 
 # Build static libraries
-WITH_STATIC_LIBRARIES:=no
+WITH_STATIC_LIBRARIES:=yes
 
 # Use this variable to add extra library dependencies when building the clients
 # with the static libmosquitto library. This may be required on some systems
@@ -108,7 +108,7 @@ WITH_COVERAGE:=no
 WITH_UNIX_SOCKETS:=yes
 
 # Build mosquitto_sub with cJSON support
-WITH_CJSON:=yes
+WITH_CJSON:=no
 
 # Build mosquitto with support for the $CONTROL topics.
 WITH_CONTROL:=yes
